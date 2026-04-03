@@ -9,14 +9,14 @@ LABEL maintainer="Nvula Bontes <aegisgulf.com>"
 LABEL description="Aegis Gulf POPIA Compliance Kernel v1.0.0"
 LABEL version="1.0.0"
 
-# Minimal dependencies only
+
 RUN pip install --no-cache-dir cryptography==42.0.8
 
 WORKDIR /app
 
 COPY engine.py server.py demo.py ./
 
-# Non-root user for security
+
 RUN addgroup -S aegis && adduser -S aegis -G aegis
 USER aegis
 
