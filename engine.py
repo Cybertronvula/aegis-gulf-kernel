@@ -25,13 +25,13 @@ from dataclasses import dataclass, field, asdict
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-KEY_SIZE_BYTES  = 32        # AES-256
-NONCE_SIZE      = 12        # GCM standard nonce
-CHAIN_GENESIS   = b"\x00" * 32  # Genesis block hash — known starting point
+
+KEY_SIZE_BYTES  = 32        
+NONCE_SIZE      = 12      
+CHAIN_GENESIS   = b"\x00" * 32  
 
 
-# ── Data structures ───────────────────────────────────────────────────────────
+
 @dataclass
 class ArchivedEntry:
     """
@@ -67,7 +67,7 @@ class VerificationResult:
     checked_in_ms  : float
 
 
-# ── Core Engine ───────────────────────────────────────────────────────────────
+
 class AegisComplianceKernel:
     """
     The Aegis Gulf compliance kernel.
@@ -86,25 +86,25 @@ class AegisComplianceKernel:
     """
 
     def __init__(self, encryption_key: Optional[bytes] = None):
-        # AES-256 key — generated fresh if not provided
+        
         self._key       = encryption_key or AESGCM.generate_key(bit_length=256)
         self._aesgcm    = AESGCM(self._key)
 
-        # HMAC key — separate from encryption key (defence in depth)
+        
         self._hmac_key  = os.urandom(KEY_SIZE_BYTES)
 
-        # Append-only vault
+       
         self._vault     : list[ArchivedEntry] = []
         self._lock      = threading.Lock()
 
-        # Chain state — tracks last HMAC for linking
+        
         self._last_hmac = CHAIN_GENESIS
 
-        # Stats
+
         self._total_bytes_archived = 0
         self._start_time           = time.monotonic()
 
-    # ── Archival ──────────────────────────────────────────────────────────────
+    
     def archive(
         self,
         event_type : str,
@@ -125,15 +125,11 @@ class AegisComplianceKernel:
             "ts"        : time.time(),
         }, sort_keys=True).encode("utf-8")
 
-        # ── AES-256-GCM encryption ────────────────────────────────────────────
-        # Fresh random nonce per entry — never reused
+        
         nonce      = os.urandom(NONCE_SIZE)
         ciphertext = self._aesgcm.encrypt(nonce, raw_payload, None)
 
-        # ── SHA-256 HMAC chain ────────────────────────────────────────────────
-        # The HMAC input is: prev_hmac || ciphertext
-        # This creates an unforgeable chain — changing any entry
-        # changes its HMAC, which changes every subsequent HMAC.
+      
         chain_input = self._last_hmac + ciphertext
         chain_hmac  = hmac.new(
             self._hmac_key,
@@ -160,7 +156,7 @@ class AegisComplianceKernel:
 
         return entry
 
-    # ── Decryption (authorised access only) ───────────────────────────────────
+    
     def decrypt(self, entry: ArchivedEntry) -> dict:
         """
         Decrypt an archived entry (simulates authorised access).
@@ -171,7 +167,7 @@ class AegisComplianceKernel:
         plaintext  = self._aesgcm.decrypt(nonce, ciphertext, None)
         return json.loads(plaintext.decode("utf-8"))
 
-    # ── Chain verification ─────────────────────────────────────────────────────
+   
     def verify_chain(self) -> VerificationResult:
         """
         Verify the integrity of the entire audit chain.
@@ -206,7 +202,7 @@ class AegisComplianceKernel:
                 self._hmac_key, chain_input, hashlib.sha256
             ).digest()
 
-            # Constant-time comparison — prevents timing attacks
+            
             if not hmac.compare_digest(expected, bytes.fromhex(entry.chain_hmac_hex)):
                 elapsed = (time.monotonic() - start_ms) * 1000
                 return VerificationResult(
@@ -233,7 +229,7 @@ class AegisComplianceKernel:
             checked_in_ms=round(elapsed, 3)
         )
 
-    # ── Tamper simulation (for demo purposes) ─────────────────────────────────
+    
     def tamper_for_demo(self, entry_id: int) -> bool:
         """
         Deliberately tamper with an entry to demonstrate detection.
@@ -242,14 +238,14 @@ class AegisComplianceKernel:
         with self._lock:
             for entry in self._vault:
                 if entry.entry_id == entry_id:
-                    # Flip the last byte of the ciphertext
+                   
                     ct       = bytearray(bytes.fromhex(entry.ciphertext_hex))
                     ct[-1]   ^= 0xFF
                     entry.ciphertext_hex = ct.hex()
                     return True
         return False
 
-    # ── Stats ─────────────────────────────────────────────────────────────────
+    
     def stats(self) -> dict:
         """Return current vault and performance statistics."""
         with self._lock:
@@ -266,7 +262,7 @@ class AegisComplianceKernel:
             "chain_genesis_hex"     : CHAIN_GENESIS.hex()[:16] + "...",
         }
 
-    # ── Vault export (for Regulator submission) ───────────────────────────────
+    
     def export_vault(self, limit: int = 100) -> list[dict]:
         """Export vault entries as JSON-serialisable dicts."""
         with self._lock:
