@@ -1,14 +1,3 @@
-"""
-Aegis Gulf Compliance Kernel — Live Demo Runner
-================================================
-Run this script to generate a full demonstration without needing
-the HTTP server. Shows every capability in sequence with real output.
-
-This is what you run when a Lead Architect says "show me."
-
-Author : Nvula Bontes — Lead Architect, Aegis Gulf
-"""
-
 import time
 import json
 from engine import AegisComplianceKernel
@@ -119,7 +108,7 @@ def main():
     except Exception as e:
         fail(f"Decryption error: {e}")
 
-    # ── Step 4: Tamper detection demo ────────────────────────────────────────
+
     banner("STEP 4: Tamper Detection — The Regulator Test")
     section("Deliberately corrupting entry #2 (simulating an attacker)...")
     kernel.tamper_for_demo(2)
@@ -134,7 +123,7 @@ def main():
     else:
         info("(tamper detection result)")
 
-    # ── Step 5: Live throughput benchmark ────────────────────────────────────
+   
     banner("STEP 5: Live Throughput Benchmark")
 
     fresh_kernel = AegisComplianceKernel()
@@ -165,7 +154,7 @@ def main():
     ok("Note: Python prototype. C++20 kernel with AES-NI achieves")
     ok("10-50x higher throughput on the same hardware.")
 
-    # ── Step 6: POPIA compliance summary ─────────────────────────────────────
+    
     banner("STEP 6: POPIA Compliance Summary")
     stats = fresh_kernel.stats()
     stats.update(kernel.stats())
@@ -183,7 +172,7 @@ def main():
     for section_ref, control in compliance_map:
         ok(f"{section_ref:<35} {control}")
 
-    # ── Final message ─────────────────────────────────────────────────────────
+    
     print(f"\n{TEAL}{'═' * 62}{RESET}")
     print(f"\n  {BOLD}Demo complete.{RESET}")
     print(f"\n  This is a working prototype of the Aegis Gulf Compliance")
