@@ -69,7 +69,7 @@ def _read_body(handler) -> dict:
 class AegisAPIHandler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
-        # Custom log format
+       
         print(f"  [{time.strftime('%H:%M:%S')}] {fmt % args}")
 
     def do_GET(self):
