@@ -39,7 +39,7 @@ def main():
 
     kernel = AegisComplianceKernel()
 
-    # ── Step 1: Archive real compliance events ────────────────────────────────
+
     banner("STEP 1: AES-256-GCM Encrypted Archival")
     section("Archiving POPIA-relevant compliance events...")
 
@@ -80,7 +80,7 @@ def main():
         info(f"     Ciphertext: {entry.ciphertext_hex[:32]}... (AES-256-GCM)")
         entries.append(entry)
 
-    # ── Step 2: Chain verification ────────────────────────────────────────────
+  
     banner("STEP 2: SHA-256 HMAC Chain Verification")
     section("Verifying full audit chain integrity...")
 
@@ -93,7 +93,7 @@ def main():
     else:
         fail(f"Chain BROKEN at entry {result.broken_at_id}")
 
-    # ── Step 3: Decrypt to prove it works ────────────────────────────────────
+    
     banner("STEP 3: Authorised Decryption (4-Eyes Simulation)")
     section("Decrypting entry #3 (financial transaction — requires dual auth)...")
 
