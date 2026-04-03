@@ -27,7 +27,7 @@ from urllib.parse import urlparse, parse_qs
 
 from engine import AegisComplianceKernel
 
-# Single kernel instance shared across all requests
+
 _kernel = AegisComplianceKernel()
 _kernel_lock = threading.Lock()
 
@@ -105,7 +105,7 @@ class AegisAPIHandler(BaseHTTPRequestHandler):
         else:
             _json_response(self, {"error": "Endpoint not found"}, 404)
 
-    # ── Handlers ──────────────────────────────────────────────────────────────
+
 
     def _handle_root(self):
         _json_response(self, {
@@ -227,7 +227,7 @@ class AegisAPIHandler(BaseHTTPRequestHandler):
         print(f"  [BENCHMARK] {count:,} ops in {elapsed_s:.3f}s = "
               f"{ops_per_s:,.0f} ops/sec\n")
 
-        # Verify chain after benchmark
+        
         verify = _kernel.verify_chain()
 
         _json_response(self, {
@@ -261,7 +261,7 @@ class AegisAPIHandler(BaseHTTPRequestHandler):
                 _json_response(self, {"error": f"Entry {entry_id} not found"}, 404)
                 return
 
-            # Verify immediately to show detection
+            
             result = _kernel.verify_chain()
 
             _json_response(self, {
@@ -280,7 +280,7 @@ class AegisAPIHandler(BaseHTTPRequestHandler):
 def run_server(host: str = "0.0.0.0", port: int = 8000):
     print(BANNER)
 
-    # Pre-archive a few sample entries on startup
+    
     print("  Archiving sample compliance events...")
     _kernel.archive("user_data_collection",
                     {"user_id": "demo-001", "consent_given": True},
